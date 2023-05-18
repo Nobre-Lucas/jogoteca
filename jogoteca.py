@@ -8,6 +8,24 @@ class Jogo:
         self.consoles = consoles
 
 
+class Usuario:
+    def __init__(self, nome, nickname, senha) -> None:
+        self.nome = nome
+        self.nickname = nickname
+        self.senha = senha
+
+
+usuario1 = Usuario('Lucas Nobre Barbosa', 'Hirudam', 'mellon')
+usuario2 = Usuario('João Davi Costa Lima', 'Parzy', 'gangplank')
+usuario3 = Usuario('Samuel Figueira Aguiar', 'rflmn', 'soldier')
+
+usuarios = {
+    usuario1.nickname: usuario1,
+    usuario2.nickname: usuario2,
+    usuario3.nickname: usuario3
+}
+
+
 app = Flask(__name__)
 app.secret_key = 'lotr'
 
@@ -46,15 +64,17 @@ def login():
 
 @app.route('/autenticar', methods=['POST',])
 def autenticar():
-    if 'mellon' == request.form['senha']:
-        session['usuario_logado'] = request.form['usuario']
-        flash(f'Usuário {session["usuario_logado"]} logado com sucesso!')
-        proxima_pagina = request.form['proxima']
-        return redirect(proxima_pagina)
+    if request.form['usuario'] in usuarios:
+        usuario = usuarios[request.form['usuario']]
+        if request.form['senha'] == usuario.senha:
+            session['usuario_logado'] = usuario.nickname
+            flash(usuario.nickname + ' logado com sucesso!')
+            proxima_pagina = request.form['proxima']
+            return redirect(proxima_pagina)
     else:
-        flash('Usuário não logado!')
+        flash('Usuário não logado.')
         return redirect(url_for('login'))
-    
+
 
 @app.route('/logout')
 def logout():
