@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, flash
+from flask import Flask, render_template, request, redirect, session, flash, url_for
 
 
 class Jogo:
@@ -24,7 +24,7 @@ def index():
 def novo():
     if 'usuario_logado' not in session or session['usuario_logado'] == None:
         flash('Somente usuários logados podem registrar novos jogos')
-        return redirect('/login?proxima=novo')
+        return redirect(url_for('login', proxima=url_for('novo')))
     return render_template('novo.html', titulo='Novo Jogo')
 
 
@@ -35,7 +35,7 @@ def criar():
     consoles = request.form['consoles']
     jogo = Jogo(nome, categorias, consoles)
     lista_de_jogos.append(jogo)
-    return redirect('/')
+    return redirect(url_for('index'))
 
 
 @app.route('/login')
@@ -50,10 +50,10 @@ def autenticar():
         session['usuario_logado'] = request.form['usuario']
         flash(f'Usuário {session["usuario_logado"]} logado com sucesso!')
         proxima_pagina = request.form['proxima']
-        return redirect(f'/{proxima_pagina}')
+        return redirect(proxima_pagina)
     else:
         flash('Usuário não logado!')
-        return redirect('/login')
+        return redirect(url_for('login'))
     
 
 @app.route('/logout')
